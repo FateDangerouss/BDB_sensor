@@ -9,4 +9,4 @@ class camera:
         self.cam.start_preview()
         sleep(2)
         self.cam.capture("object.jpg")
-        self.cam.stop_(preview)
+        self.cam.stop_preview()

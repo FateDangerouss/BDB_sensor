@@ -1,26 +1,33 @@
 import ultrasonic as us
 from time import sleep
-import threading
+import camera
+import imageclassify
+import gpio
 
 man_info = 0
-state = 0
 
-mandet = us.Ultrasonic(17,18)
+out1 = gpio.myGPIO([27,"OUT"])
+out1.output(27,"HIGH")
 
-def det_man():
+mandet = us.Ultrasonic(21,18)
+cam = camera.camera()
+img = imageclassify.ImageClassify()
+
+while True:
     while True:
         if mandet.distance() <= 50:
             man_info = 1
-            print(1)
             print("start working")
             break
         else:
             man_info = 0
-            print(0)
         sleep(0.5)
-
-t_dm = threading.Thread(target = det_man, name = "det_man")
-
-t_dm.start()
-t_dm.join()
-print("end")
+    cam.get()
+    img.get_file('object.jpg')
+    item = img.get_item()
+    print(str(item['result']) + '\n')
+    result = ''
+    for i in range(0,5):
+        if item['result'][i]['score'] >= 0.4:
+            result = result + item['result'][i]['root'] + '\n' + item['result'][i]['keyword'] + '\n\n'
+    print(result)
