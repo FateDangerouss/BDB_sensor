@@ -10,3 +10,9 @@ class camera:
         sleep(2)
         self.cam.capture("object.jpg")
         self.cam.stop_preview()
+
+if __name__ == "__main__":
+    cam = PiCamera()
+    cam.start_preview()
+    sleep(30)
+    cam.stop_preview()
