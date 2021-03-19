@@ -4,7 +4,7 @@ import camera
 import imageclassify
 import gpio
 import threading
-# import LCD
+import LCD
 
 
 tuple_1 = ("平板电脑", "笔记本电脑", "商品-数码产品")
@@ -25,11 +25,10 @@ state_4 = 0
 state = 0
 res = 0
 
-vcc = gpio.myGPIO([21, "OUT", 10, "OUT"])
+vcc = gpio.myGPIO([21, "OUT"])
 vcc.output(21, "HIGH")
-vcc.output(10, "HIGH")
 
-IO = gpio.myGPIO([19, "OUT", 13, "OUT", 16, "OUT", 12, "OUT", 0, "OUT", 5, "OUT", 1, "OUT", 6, "OUT", 7, "IN"])
+IO = gpio.myGPIO([19, "OUT", 13, "OUT", 16, "OUT", 12, "OUT", 0, "OUT", 5, "OUT", 1, "OUT", 6, "OUT", 7, "IN", 24, "OUT"])
 IO.output(19, "LOW")
 IO.output(13, "LOW")
 IO.output(16, "LOW")
@@ -38,6 +37,7 @@ IO.output(0, "LOW")
 IO.output(5, "LOW")
 IO.output(1, "LOW")
 IO.output(6, "LOW")
+IO.output(24, "HIGH")
 
 objdet = us.Ultrasonic(26, 20)
 box_1 = us.Ultrasonic(4, 14)
@@ -45,8 +45,9 @@ box_2 = us.Ultrasonic(15, 17)
 box_3 = us.Ultrasonic(18, 27)
 box_4 = us.Ultrasonic(22, 23)
 
-# LCDoutput = LCD.LCDoutput()
-# LCDoutput.output("Begin", "Fuck")
+LCDoutput = LCD.LCDoutput()
+LCDoutput.output("Welcome!", "System starting")
+LCDoutput.output("Welcome!", "")
 
 cam = camera.camera()
 img = imageclassify.ImageClassify()
@@ -58,7 +59,7 @@ def det():
         while True:
             if state == 0:
                 while True:
-                    if objdet.distance() <= 30:
+                    if objdet.distance() <= 20:
                         break
                     else:
                         time.sleep(0.5)
@@ -114,6 +115,9 @@ def det():
                         num_3 += 1
                 if (num_1 * num_2 != 0) or (num_2 * num_3 != 0) or (num_3 * num_1 != 0):
                     print("请每次放置一种物品。")
+                    IO.output(24, "LOW")
+                    LCDoutput.output("Please place one", "item at a time")
+                    vcc.output(21, "HIGH")
                 elif num_1 != 0:
                     if state_1 == 0:
                         IO.output(19, "HIGH")
@@ -121,6 +125,9 @@ def det():
                         IO.output(19, "LOW")
                     else:
                         print("箱子已满")
+                        IO.output(24, "LOW")
+                        LCDoutput.output("The box is full", "")
+                        IO.output(24, "HIGH")
                 elif num_2 != 0:
                     if state_2 == 0:
                         IO.output(13, "HIGH")
@@ -128,13 +135,19 @@ def det():
                         IO.output(13, "LOW")
                     else:
                         print("箱子已满")
+                        IO.output(24, "LOW")
+                        LCDoutput.output("The box is full", "")
+                        IO.output(24, "HIGH")
                 elif num_3 != 0:
                     if state_3 == 0:
                         IO.output(16, "HIGH")
                         time.sleep(1)
                         IO.output(16, "LOW")
                     else:
-                        print("箱子已满") 
+                        print("箱子已满")
+                        IO.output(24, "LOW")
+                        LCDoutput.output("The box is fulle", "")
+                        IO.output(24, "HIGH")
                 elif num_1 == num_2 == num_3 == 0 and objlist != []:
                     if state_4 == 0:
                         IO.output(12, "HIGH")
@@ -142,6 +155,13 @@ def det():
                         IO.output(12, "LOW")
                     else:
                         print("箱子已满")
+                        IO.output(24, "LOW")
+                        LCDoutput.output("The box is full", "")
+                        IO.output(24, "HIGH")
+                else:
+                    IO.output(24, "LOW")
+                    LCDoutput.output("Please relocate", "the item")
+                    IO.output(24, "HIGH")
                 res = 0
     
             if state == 0 and IO.input(7) == 1:

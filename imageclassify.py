@@ -14,3 +14,4 @@ class ImageClassify:
     
     def get_item(self):
         return self.client.advancedGeneral(self.file)
+
